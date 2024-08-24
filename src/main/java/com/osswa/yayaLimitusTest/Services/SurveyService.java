@@ -1,7 +1,9 @@
 package com.osswa.yayaLimitusTest.Services;
 
 
+import com.osswa.yayaLimitusTest.DTO.QuestionDto;
 import com.osswa.yayaLimitusTest.DTO.SurveyCreateRequest;
+import com.osswa.yayaLimitusTest.DTO.SurveyDto;
 import com.osswa.yayaLimitusTest.Model.Survey;
 import com.toshiba.mwcloud.gs.Collection;
 import com.toshiba.mwcloud.gs.GSException;
@@ -33,6 +35,7 @@ public class SurveyService {
     public String create (SurveyCreateRequest request){
 
         Survey survey = new Survey();
+        //TODO: find the problem with this
         survey.setId(KeyGenerator.next("survey"));
         survey.set_active(request.isActive());
         survey.setTitle(request.getTitle());
@@ -52,27 +55,29 @@ public class SurveyService {
 
     public SurveyDto getSurvey (String surveyId){
         String tql = String.format("select * from survey where id='%s'", surveyId);
-        List<SurveyDto> surveyDtos = Query(tql, true);
+        List<SurveyDto> surveyDtos = query(tql, true);
         if (surveyDtos == null || surveyDtos.isEmpty()){
             throw new ResponseStatusException(NOT_FOUND, "Not Found");
         }
         return surveyDtos.getFirst();
     }
 
+    //TODO check the </SurveyDto> that i did not include
     public List<SurveyDto> getSurveys (){
         String tql = "select * from surveys limit 50";
         return query(tql, false);
     }
 
     private List<SurveyDto> query(String tql, boolean includeQuestion){
-        List<SurveyDto> result = new ArrayList<>().reversed();
+        List<SurveyDto> result = new ArrayList<>();
         Query<Survey> query;
         try {
             query = surveyCollection.query(tql);
             RowSet<Survey> rs = query.fetch();
             while (rs.hasNext()){
                 Survey model = rs.next();
-                List<QuestionSto> questions = new ArrayList<>();
+                List<QuestionDto> questions = new ArrayList<>();
+                //TODO: build the questionService class
                 if (includeQuestion) questions = questionService.getQuestions(model.getId());
                 result.add(
                         SurveyDto.builder()
