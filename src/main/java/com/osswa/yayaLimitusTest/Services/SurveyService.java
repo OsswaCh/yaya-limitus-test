@@ -17,6 +17,7 @@ import org.springframework.web.server.ResponseStatusException;
 import javax.crypto.KeyGenerator;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
@@ -36,7 +37,9 @@ public class SurveyService {
 
         Survey survey = new Survey();
         //TODO: find the problem with this
-        survey.setId(KeyGenerator.next("survey"));
+        //generating a new identifier for each new survey
+        //survey.setId(KeyGenerator.next("survey"));
+        survey.setId(UUID.randomUUID().toString());
         survey.set_active(request.isActive());
         survey.setTitle(request.getTitle());
         survey.setDescription(request.getDescription());
@@ -56,7 +59,7 @@ public class SurveyService {
     public SurveyDto getSurvey (String surveyId){
         String tql = String.format("select * from survey where id='%s'", surveyId);
         List<SurveyDto> surveyDtos = query(tql, true);
-        if (surveyDtos == null || surveyDtos.isEmpty()){
+        if (surveyDtos.isEmpty()){
             throw new ResponseStatusException(NOT_FOUND, "Not Found");
         }
         return surveyDtos.getFirst();
