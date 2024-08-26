@@ -4,7 +4,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -43,7 +42,7 @@ public class Survey {
     private List<SurveyResponse> surveyResponses;
 
     //constructor
-    public Survey(){
+    public Survey(String title, String description, boolean active, LocalDateTime now){
         this.title="Untitled survey";
         this.description = "No description provided";
         this.isActive = false;

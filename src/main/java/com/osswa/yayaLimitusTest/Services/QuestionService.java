@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class QuestionService {
@@ -23,7 +24,7 @@ public class QuestionService {
     private com.toshiba.mwcloud.gs.Collection<String, Question> questionCollection;
 
     //Fetches all questions related to a given survey ID.
-    public List<QuestionDto> getQuestions(String surveyId){
+    public List<QuestionDto> getQuestions(UUID surveyId){
 
         String tql = String.format("SELECT * FROM questions WHERE survey_id = '%s'", surveyId);
         List<QuestionDto> questionDtos = new ArrayList<>();

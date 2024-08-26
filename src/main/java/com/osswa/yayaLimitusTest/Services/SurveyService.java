@@ -5,19 +5,19 @@ import com.osswa.yayaLimitusTest.DTO.QuestionDto;
 import com.osswa.yayaLimitusTest.DTO.SurveyCreateRequest;
 import com.osswa.yayaLimitusTest.DTO.SurveyDto;
 import com.osswa.yayaLimitusTest.Model.Survey;
-import com.toshiba.mwcloud.gs.Collection;
-import com.toshiba.mwcloud.gs.GSException;
-import com.toshiba.mwcloud.gs.RowSet;
+import com.osswa.yayaLimitusTest.repository.SurveyRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-import com.toshiba.mwcloud.gs.Query;
 import org.springframework.web.server.ResponseStatusException;
+import java.util.stream.Collectors;
 
-import javax.crypto.KeyGenerator;
-import java.util.ArrayList;
+
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collector;
 
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
@@ -28,76 +28,46 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 public class SurveyService {
 
     @Autowired
-    private Collection<String, Survey> surveyCollection;
+    private SurveyRepository surveyRepository;
 
     @Autowired
     private QuestionService questionService;
 
-    public String create (SurveyCreateRequest request){
-
-        Survey survey = new Survey();
-        //TODO: find the problem with this
-        //generating a new identifier for each new survey
-        //survey.setId(KeyGenerator.next("survey"));
-        survey.setId(UUID.randomUUID().toString());
-        survey.set_active(request.isActive());
-        survey.setTitle(request.getTitle());
-        survey.setDescription(request.getDescription());
-        try {
-            log.info("pit: {}", survey);
-            surveyCollection.put(survey.getId(), survey);
-        }
-        catch (GSException e){
-            //TODO: make better
-            e.printStackTrace();
-        }
-
-        return survey.getId();
-
+    public UUID create(SurveyCreateRequest request){
+        Survey survey = new Survey(request.getTitle(), request.getDescription(), request.isActive());
+        log.info("Creating survey: {}", survey);
+        Survey savedSurvey = surveyRepository.save(survey);
+        return savedSurvey.getId();
     }
 
-    public SurveyDto getSurvey (String surveyId){
-        String tql = String.format("select * from survey where id='%s'", surveyId);
-        List<SurveyDto> surveyDtos = query(tql, true);
-        if (surveyDtos.isEmpty()){
-            throw new ResponseStatusException(NOT_FOUND, "Not Found");
-        }
-        return surveyDtos.getFirst();
+    public SurveyDto getSurvey (UUID surveyId){
+        Survey survey = surveyRepository.findById(surveyId)
+                .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "Survey not found") );
+        return convertToDto(survey, true);
     }
 
-    //TODO check the </SurveyDto> that i did not include
-    public List<SurveyDto> getSurveys (){
-        String tql = "select * from surveys limit 50";
-        return query(tql, false);
+    //fetching all surveys with pagination
+    public List<SurveyDto> getSurveys(){
+        Page<Survey> surveys = surveyRepository.findAll(PageRequest.of(0, 50));
+        List<Survey> surveyList = surveys.getContent();
+
+        return surveys.stream()
+                .map(survey -> convertToDto(survey, false))
+                .collect(Collectors.toList());
     }
 
-    private List<SurveyDto> query(String tql, boolean includeQuestion){
-        List<SurveyDto> result = new ArrayList<>();
-        Query<Survey> query;
-        try {
-            query = surveyCollection.query(tql);
-            RowSet<Survey> rs = query.fetch();
-            while (rs.hasNext()){
-                Survey model = rs.next();
-                List<QuestionDto> questions = new ArrayList<>();
-                //TODO: build the questionService class
-                if (includeQuestion) questions = questionService.getQuestions(model.getId());
-                result.add(
-                        SurveyDto.builder()
-                                .id(model.getId())
-                                .createdAt(model.getCreatedAt())
-                                .description(model.getDescription())
-                                .title(model.getTitle())
-                                .isActive(model.is_active())
-                                .questions(questions)
-                                .build()
-                );
-            }
+    private SurveyDto convertToDto(Survey survey, boolean includeQuestions){
+        List<QuestionDto> questions = includeQuestions?
+                questionService.getQuestions(survey.getId()) : null;
 
-        } catch (GSException e){
-            e.printStackTrace();
-        }
-        return result;
+        return SurveyDto.builder()
+                .id(survey.getId())
+                .createdAt(survey.getCreatedAt())
+                .description(survey.getDescription())
+                .title(survey.getTitle())
+                .isActive(survey.is_active())
+                .questions(questions)
+                .build();
     }
 
 }
