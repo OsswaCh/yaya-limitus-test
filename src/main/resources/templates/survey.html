@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="">
+<head>
+    <title>Surveys</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+</head>
+<body>
+<div class="container mt-4">
+    <h2>Survey List</h2>
+    <div class="table-responsive">
+        <table class="table table-bordered" id="dataTableSurvey">
+            <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Title</th>
+                <th scope="col">Description</th>
+                <th scope="col">Is Active</th>
+                <th scope="col">Created Date</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="survey : ${surveys}">
+                <td>
+                    <a class="nav-link" th:href="@{/responses/{surveyId}(surveyId=${survey.id})}">Answer</a>
+                </td>
+                <td>
+                    <a class="nav-link" th:href="@{/surveys/{surveyId}/responses(surveyId=${survey.id})}" th:text="${survey.title}"></a>
+                </td>
+                <td th:text="${survey.description}"></td>
+                <td th:text="${survey.isActive} ? 'Yes' : 'No'"></td>
+                <td th:text="${survey.createdAt}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>
