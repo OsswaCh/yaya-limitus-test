@@ -1,5 +1,6 @@
 package com.osswa.yayaLimitusTest.Model;
 import jakarta.persistence.*;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,9 +10,10 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "surveys")
+@Data
 public class Survey {
 
-    //getters qnd setters
+    //getters and setters
     @Setter
     @Getter
     @Id
@@ -24,6 +26,7 @@ public class Survey {
     private String title;
 
     @Getter
+    @Setter
     @Column
     private String description;
 
@@ -42,7 +45,7 @@ public class Survey {
     private List<SurveyResponse> surveyResponses;
 
     //constructor
-    public Survey(String title, String description, boolean active, LocalDateTime now){
+    public Survey(){
         this.title="Untitled survey";
         this.description = "No description provided";
         this.isActive = false;
