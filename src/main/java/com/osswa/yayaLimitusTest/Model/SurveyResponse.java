@@ -7,6 +7,7 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -36,10 +37,11 @@ public class SurveyResponse {
 
 
     //relations
-    @OneToOne (mappedBy = "surveyResponses", cascade =  CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToOne( cascade =  CascadeType.ALL, fetch = FetchType.LAZY)
     private Survey survey;
 
-    @OneToMany
+    @OneToMany (mappedBy = "surveyResponses", cascade =  CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<SurveyResponse> surveyResponses;
 
 
 

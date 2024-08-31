@@ -37,7 +37,7 @@ public class Answer {
 
 
     //Relations
-    @OneToOne (mappedBy = "Answers", cascade =  CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToOne (cascade =  CascadeType.ALL, fetch = FetchType.LAZY)
     private SurveyResponse surveyResponse;
 
 

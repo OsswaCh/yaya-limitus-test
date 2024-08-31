@@ -23,7 +23,8 @@ public class Respondent {
     private String email;
 
     //relations
-    @OneToOne(mappedBy = "respondents", cascade =  CascadeType.ALL, fetch = FetchType.LAZY)
+    //todo: check if this is one to one or one to many
+    @OneToMany(mappedBy = "respondents", cascade =  CascadeType.ALL, fetch = FetchType.LAZY)
     private SurveyResponse surveyResponse;
 
     //constructor
