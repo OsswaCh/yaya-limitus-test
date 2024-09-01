@@ -38,8 +38,8 @@ public class Survey {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    @OneToMany (mappedBy = "survey", cascade =  CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Question> questions;
+        @OneToMany (mappedBy = "survey", cascade =  CascadeType.ALL, fetch = FetchType.LAZY)
+        private List<Question> questions;
 
     @OneToOne (mappedBy = "survey", cascade =  CascadeType.ALL, fetch = FetchType.LAZY)
     private List<SurveyResponse> surveyResponses;

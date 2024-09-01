@@ -13,7 +13,7 @@ public class SurveyWebController {
     private SurveyService surveyService;
 
     @GetMapping("/surveys")
-    //TODO inspect Model
+    //TODO: inspect Model
     public String listSurveys (Model model){
         model.addAttribute("surveys", surveyService.getSurveys());
         return "surveys";
